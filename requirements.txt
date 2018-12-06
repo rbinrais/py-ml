@@ -2,3 +2,4 @@ requests_html
 pandas
 lxml
 requests
+pytest
