@@ -90,7 +90,7 @@ def save_comments_to_csv(article_list,directory):
             response = session.get(article["url_reddit_internal"])
             status = is_200(response)
             exit_needed(status)
-            r = response.html.find("p")pyth
+            r = response.html.find("p")
             if r is not None:
                 # base64 encode the article internal url and use it as a filename. 
                 filename = '%s.csv' % base64.b64encode(article["url_reddit_internal"].encode())
