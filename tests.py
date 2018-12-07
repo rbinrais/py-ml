@@ -1,6 +1,5 @@
 import reddit_news_scrap
 from requests_html import HTMLSession
-from collections import namedtuple
 
 def test_ensure_200():
     session = HTMLSession()
@@ -35,7 +34,6 @@ class MockArticle:
         return self.absolute_links[position]
 
 def test_article_attributes():
-    #Link = namedtuple("Link", "text")
     text = "Posted by\nu/OMS6\n4 hours ago\nFBI catches Air Force senior Officer during underage sex sting operation\nabcnews"
     absolute_links = ["https://www.reddit.com/r/news/comments/01","https://source-url","https://www.reddit.com/user/testuser"]
     articles = []
@@ -51,6 +49,3 @@ def test_article_attributes():
     expected_result = [expected_result]
     result =  reddit_news_scrap.get_article_attributes(articles)
     assert result == expected_result
-    #print(result,expected_result)
-
-#test_article_attributes()
