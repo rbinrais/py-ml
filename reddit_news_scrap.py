@@ -77,8 +77,8 @@ def get_article_attributes(articles):
     return article_list
 
 def check_comment(comment):
-    not_empty = comments.full_text is not None
-    return (not_empty) and (not contains_noise_words(comments.full_text))
+    not_empty = comment.full_text is not None
+    return (not_empty) and (not contains_noise_words(comment.full_text))
 
 def save_comments_to_csv(article_list,directory):
     """
@@ -100,8 +100,8 @@ def save_comments_to_csv(article_list,directory):
                 # base64 encode the article internal url and use it as a filename. 
                 filename = '%s.csv' % base64.b64encode(article["url_reddit_internal"].encode()).decode()
                 df["comment"] = [comment.full_text 
-                                 for comment in comments if check_comment(comment)]
-                df.to_csv(filename)
+                                 for comment in r if check_comment(comment)]
+                df.to_csv(directory+"/"+filename)
         except Exception as e:
                 print ("Error occurred while fetching --> ",article["url_reddit_internal"])
                 print(e)
