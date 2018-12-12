@@ -76,6 +76,10 @@ def get_article_attributes(articles):
         article_list.append(article_dict)
     return article_list
 
+def check_comment(comment):
+    not_empty = comments.full_text is not None
+    return (not_empty) and (not contains_noise_words(comments.full_text))
+
 def save_comments_to_csv(article_list,directory):
     """
     Iterate over articles and get all the comments (till date)
@@ -90,19 +94,14 @@ def save_comments_to_csv(article_list,directory):
             response = session.get(article["url_reddit_internal"])
             status = is_200(response)
             exit_needed(status)
+            df = pd.DataFrame()
             r = response.html.find("p")
             if r is not None:
                 # base64 encode the article internal url and use it as a filename. 
-                filename = '%s.csv' % base64.b64encode(article["url_reddit_internal"].encode())
-                try:
-                    with open( directory+"/"+filename, 'w') as myfile:
-                        for comments in r:
-                            if comments.full_text is not None and contains_noise_words(comments.full_text) == False:
-                                myfile.write(comments.full_text+ "\n")
-                except Exception as e:
-                        print ("Error occurred while saving comments for the article --> ",article["url_reddit_internal"])
-                        print(e)
-
+                filename = '%s.csv' % base64.b64encode(article["url_reddit_internal"].encode()).decode()
+                df["comment"] = [comment.full_text 
+                                 for comment in comments if check_comment(comment)]
+                df.to_csv(filename)
         except Exception as e:
                 print ("Error occurred while fetching --> ",article["url_reddit_internal"])
                 print(e)
