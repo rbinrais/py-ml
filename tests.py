@@ -49,3 +49,7 @@ def test_article_attributes():
     expected_result = [expected_result]
     result =  reddit_news_scrap.get_article_attributes(articles)
     assert result == expected_result
+
+def test_contains_noise_words():
+    comment = "more replies"
+    assert reddit_news_scrap.contains_noise_words(comment)
