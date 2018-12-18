@@ -41,7 +41,7 @@ def _decode_labels(x):
         return "C"
 
 def _generate_labels(df):    
-    return df.apply(encode_labels, axis=1)
+    return df.apply(_encode_labels, axis=1)
 
 def _label_propagation(df):
     X = _generate_features(df)
@@ -51,7 +51,7 @@ def _label_propagation(df):
     return label_prop_model.predict(X.toarray())
 
 def _get_new_labels(labels, df):
-    new_labels = [decode_labels(elem) for elem in labels]
+    new_labels = [_decode_labels(elem) for elem in labels]
     df["labels"] = new_labels
     return df
 
