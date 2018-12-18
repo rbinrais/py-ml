@@ -3,7 +3,7 @@ from glob import glob
 import random
 
 def _get_csvs():
-    csvs = glob("comments/*.csv")
+    return glob("comments/*.csv")
 
 def _add_label_data(csv):
     df = pd.read_csv(csv)
@@ -22,6 +22,9 @@ def prepare_for_labeling():
     csvs = _get_csvs()
     for index, csv in enumerate(csvs):
         if index < 2:
-            _label_data(csv)
+            _add_label_data(csv)
         else:
             _add_unlabeled_data(csv)
+
+if __name__ == '__main__':
+    prepare_for_labeling()
