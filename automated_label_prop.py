@@ -7,22 +7,24 @@ import pandas as pd
 import code
 from glob import glob
 
-csvs = glob("comments/*.csv")
-dfs = [pd.read_csv(csv, index_col=False) for csv in csvs]
+def combine_data(dfs):
+    df = pd.DataFrame()
+    for tmp in dfs:
+        df = df.append(tmp)
+    df.index = list(range(len(df)))
+    return df
 
-df = pd.DataFrame()
-for tmp in dfs:
-    df = df.append(tmp)
-df.index = list(range(len(df)))
+def get_data():
+    csvs = glob("comments/*.csv")
+    dfs = [pd.read_csv(csv, index_col=False) for csv in csvs]
+    return combine_data(dfs)
 
-# data cleaning
-df = df[pd.notnull(df["comment"])]
+def clean_data(df):
+    return df[pd.notnull(df["comment"])]
 
-# encoding step
-
-## Encode Features
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(df["comment"])
+def generate_features(df):
+    vectorizer = TfidfVectorizer()
+    return vectorizer.fit_transform(df["comment"])
 
 def encode_labels(x):
     if x["labels"] == "L":
@@ -38,14 +40,35 @@ def decode_labels(x):
     if x == 1:
         return "C"
 
-labels = df.apply(encode_labels, axis=1)
-# Active Learning Step!
-label_prop_model = LabelPropagation()
-label_prop_model.fit(X.toarray(), labels)
-labels = label_prop_model.predict(X.toarray())
-new_labels = [decode_labels(elem) for elem in labels]
-df["labels"] = new_labels
-df.to_csv("labeled_data.csv", index=False)
+def generate_labels(df):    
+    return df.apply(encode_labels, axis=1)
+
+def label_propagation(df):
+    X = generate_features(df)
+    labels = generate_labels(df)
+    label_prop_model = LabelPropagation()
+    label_prop_model.fit(X.toarray(), labels)
+    return label_prop_model.predict(X.toarray())
+
+def get_new_labels(labels, df):
+    new_labels = [decode_labels(elem) for elem in labels]
+    df["labels"] = new_labels
+    return df
+
+def propagate_labels():
+    df = get_data()
+    df = clean_data(df)
+    labels = label_propagation(df)
+    return get_new_labels(labels, df)
+
+def save_data(df, path):
+    df.to_csv(path, index=False)
+
+if __name__ == '__main__':
+    df = propagate_labels()
+    save_data(df, "labeled_data.csv")
+
+# How to do this in general:
 # we don't want to label everything at once (in the real world)
 # how we should handle things:
 # 1. predict some small amount of new labels, that are randomly chosen
