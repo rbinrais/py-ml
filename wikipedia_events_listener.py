@@ -7,6 +7,12 @@ import os
 from datetime import datetime
 import pandas as pd
 import sys
+import azure_helper
+from dotenv import load_dotenv
+from os.path import join, dirname
+ 
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 def contains_noise_words(comment):
     """Helper check for noise words in a text.
@@ -24,7 +30,8 @@ def check_text_for_noise_words(text):
 
 def capture_wiki(show_runtime=False, 
                 wiki_recent_changes_event_url = "https://stream.wikimedia.org/v2/stream/recentchange",
-                timeout=30):
+                timeout=30,
+                upload_To_blob=False):
     """Main program listens to wikipedia stream for live changes for the duration set by the timeout (in seconds) parameter.
        Titles and comments are captured from the live stream and then stored in the titles.csv and comments.csv respectively.
        Articles can be in any language but only those in English langauge are parsed for processing. 
@@ -43,14 +50,33 @@ def capture_wiki(show_runtime=False,
         os.makedirs(directory)
 
     titles, comments = get_wiki_recent_updates(wiki_recent_changes_event_url,timeout)
-    save_titles_to_csv(titles,directory,"titles")
-    save_comments_to_csv(comments,directory,"comments")
+    titles_filename = "titles.csv"
+    comments_filename = "comments.csv"
+    
+    save_titles_to_csv(titles,directory,titles_filename)
+    save_comments_to_csv(comments,directory,comments_filename)
+    
+    if upload_to_blob:
+        full_path_to_titles_file = directory + "/" + titles_filename
+        full_path_to_comments_file = directory + "/" + comments_filename
+
+        upload_To_blob(titles_filename,full_path_to_titles_file)
+        upload_To_blob(comments_filename,full_path_to_comments_file)
     
     if show_runtime == True:
         print('Total running time: ' + str (datetime.now() - startTime))
 
 def save_to_csv(dataframe, directory,filename):
     dataframe.to_csv(directory+"/"+filename)
+
+def upload_To_blob(file_name,full_path_to_file):
+    account_key= get_env_var('AZURE_STORAGE_KEY')
+    account_name = get_env_var('AZURE_STORAGE_ACCOUNT')
+    container_name = get_env_var('AZURE_CONTAINER_NAME')
+
+    blob = azure_helper.get_block_service(account_name,account_key)
+    azure_helper.upload_file_to_blob(blob,file_name,container_name,full_path_to_file)
+
 
 def is_timeout(timeout):
     if time.time() > timeout:
@@ -112,8 +138,32 @@ def save_title_to_csv(dataframe,titles,directory,filename):
     dataframe = pd.DataFrame(titles, columns=["titles"])
     dataframe.to_csv(directory+"/"+filename)
 
-if __name__ == "__main__":
-    capture_wiki(show_runtime=True)
+def get_env_var(name):
+    try:
+       return os.getenv(name)
+    except KeyError:
+        return None
 
-#if __name__ == '__main__':
-    #run_scraper(show_runtime=True)
+if __name__ == "__main__":
+    
+    
+    timeout = 30 #value is in seconds
+    try:
+        timeout = int(get_env_var("TIMEOUT_IN_SEC"))
+    except Exception:
+        pass
+    
+    wiki_recent_changes_url = get_env_var("WIKIPEDIA_EVENTS_ENDPOINT")
+    if wiki_recent_changes_url is None:
+        wiki_recent_changes_url = "https://stream.wikimedia.org/v2/stream/recentchange"
+    
+    upload_to_blob = get_env_var("UPLOAD_TO_AZURE_BLOB")
+    if upload_to_blob is None:
+        upload_to_blob = False
+    else:
+        upload_to_blob = True
+
+    capture_wiki(show_runtime=True,
+                 wiki_recent_changes_event_url=wiki_recent_changes_url,
+                 timeout= timeout,
+                 upload_To_blob=upload_To_blob)
