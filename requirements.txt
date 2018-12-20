@@ -4,3 +4,5 @@ requests
 pytest
 sklearn
 sseclient
+azure-storage
+dotenv
