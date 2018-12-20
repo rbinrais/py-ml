@@ -1,8 +1,8 @@
 # Example ML project for Azure
 
-The goal of this project is to assess political lean of reddit users.  For this purpose we have built the following components:
+The goal of this project is to assess wikipedia article titles and comments.  For this purpose we have built the following components:
 
-* web scraper:
+* Wikipedia events listener
 * active learning (for labeling of data):
 * machine learning classification of political lean: 
 * data visualization:
@@ -17,7 +17,7 @@ Note we recommend python 3.6+, this may work on earlier versions, but we make no
 
 And then scrape some data by running:
 
-`python reddit_news_scrap.py`
+`python wikipedia_events_listener.py`
 
 ## Run the tests
 
