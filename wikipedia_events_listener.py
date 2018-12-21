@@ -10,7 +10,7 @@ import sys
 import azure_helper
 from dotenv import load_dotenv
 from os.path import join, dirname
- 
+
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
@@ -125,18 +125,27 @@ def check_conditions(text, server_url, article_type, isBot=False):
           return True 
     return False
 
-def save_titles_to_csv(titles,directory,filename):
-    dataframe = pd.DataFrame(titles, columns=["titles"])
-    dataframe.to_csv(directory+"/"+filename)
+def update_existing_csv(dataframe, directory, filename, col_name):
+    existing_csv = directory+"/"+filename
+    if os.path.exists(existing_csv):
+        df = pd.read_csv(existing_csv)
+        df = df[col_name]
+        df = pd.DataFrame(df)
+        dataframe = dataframe.append(df)
+        dataframe.index = list(range(len(dataframe)))
+    return dataframe 
 
-def save_comments_to_csv(comments,directory,filename):
+def save_titles_to_csv(titles, directory, filename):
+    dataframe = pd.DataFrame(titles, columns=["titles"])
+    dataframe = update_existing_csv(dataframe, directory, 
+                                    filename, "titles")
+    dataframe.to_csv(directory+"/"+filename, index=False)
+
+def save_comments_to_csv(comments, directory, filename):
     dataframe = pd.DataFrame(comments, columns=["comments"])
-    dataframe.to_csv(directory+"/"+filename)
-
-
-def save_title_to_csv(dataframe,titles,directory,filename):
-    dataframe = pd.DataFrame(titles, columns=["titles"])
-    dataframe.to_csv(directory+"/"+filename)
+    dataframe = update_existing_csv(dataframe, directory, 
+                                    filename, "comments")
+    dataframe.to_csv(directory+"/"+filename, index=False)
 
 def get_env_var(name):
     try:
