@@ -5,4 +5,4 @@ pytest
 sklearn
 sseclient
 azure-storage
-dotenv
+python-dotenv
