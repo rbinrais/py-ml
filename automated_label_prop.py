@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from sklearn import datasets
 from sklearn.semi_supervised import LabelPropagation
@@ -56,6 +57,9 @@ def propagate_labels():
     return _get_new_labels(labels, df)
 
 def _save_data(df, path):
+    if os.path.exists(path):
+        tmp = pd.read_csv(path)
+        df = df.append(tmp)
     df.to_csv(path, index=False)
 
 if __name__ == '__main__':
