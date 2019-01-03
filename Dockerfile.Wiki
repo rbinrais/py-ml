@@ -1,0 +1,8 @@
+FROM python:3
+
+WORKDIR /usr/src/app
+COPY requirements.txt ./
+COPY wikipedia_events_listener.py ./
+COPY azure_helper.py ./
+RUN pip install --no-cache-dir -r requirements.txt
+CMD [ "python", "./wikipedia_events_listener.py" ]
