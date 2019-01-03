@@ -20,3 +20,7 @@ def upload_file_to_blob(block_blob_service,file_name, container_name,full_path_t
     print("Uploading file: "+full_path_to_file+" to azure blob storage: " + container_name)
      # Upload the created file, use filename for the blob name
     block_blob_service.create_blob_from_path(container_name,file_name, full_path_to_file)
+
+def download_file_from_blob(block_blob_service,file_name, container_name,full_path_to_file):
+     print("\nDownloading blob to " + full_path_to_file)
+     block_blob_service.get_blob_to_path(container_name, file_name, full_path_to_file)
