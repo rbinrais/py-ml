@@ -46,6 +46,7 @@ def generate_predictions():
     text_labels = label_encoder.inverse_transform(labels)
     data["labels"] = text_labels
     data.to_csv("predicted_labels.csv", index=False)
-
+    azure_helper.upload_to_blob("predicted_labels.csv","predicted_labels.csv")
+    
 if __name__ == '__main__':
     generate_predictions()
