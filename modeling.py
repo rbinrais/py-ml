@@ -4,6 +4,14 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import joblib
+import azure_helper
+
+def load_data_from_blob(file_name,retain_file=True):
+    azure_helper.download_from_blob(file_name,file_name)
+    data = pd.read_csv(file_name)
+    if retain_file == False:
+        os.remove(file_name)
+    return data
 
 def tokenize(data):
     sentences = []
@@ -36,7 +44,7 @@ def feature_post_processing(features):
     return features.T
 
 def generate_clf(csv):
-    df = pd.read_csv(csv)
+    df = load_data_from_blob(csv)
     features = do_word2vec(df["comments"])
     features = feature_post_processing(features)
     labels, encoder = transform_labels(df["labels"])
@@ -47,8 +55,15 @@ def generate_clf(csv):
         random_state=42,
         C=0.8)
     clf.fit(features, labels)
-    joblib.dump(clf, 'clf.joblib')
-    joblib.dump(encoder, 'label_encoder.joblib')
+    
+    model_file_name = 'clf.joblib'
+    joblib.dump(clf, model_file_name)
+    encoder_file_name = 'label_encoder.joblib'
+    joblib.dump(encoder, encoder_file_name)
+    
+    azure_helper.upload_to_blob(model_file_name,model_file_name)
+    azure_helper.upload_to_blob(encoder_file_name,encoder_file_name)
+    
 
 if __name__ == '__main__':
     generate_clf("labeled_data.csv")
