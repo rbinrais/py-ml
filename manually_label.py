@@ -38,6 +38,9 @@ def ask_for_labels(folder, filename):
     df = get_csv(folder, filename)
     df, index = hand_label(df)
     df = auto_label(df, index)
+    name, ext = filename.split(".")
+    name += "with_labels"
+    filename = name + ext
     write_csv(df, folder, filename)
 
 if __name__ == '__main__':

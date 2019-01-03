@@ -11,6 +11,7 @@ def feature_size_pad(features):
         features.index = list(range(len(features)))
         empty_df.index = list(range(len(empty_df)))
         return pd.concat([features, empty_df], axis=1)
+    # TODO think about how to handle this properly so we don't lose any features
     elif features.shape[1] > labeled_features.shape[1]:
         columns_to_keep = list(range(labeled_features.shape[1]))
         return features[columns_to_keep]
