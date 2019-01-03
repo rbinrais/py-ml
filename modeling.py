@@ -28,7 +28,8 @@ def do_word2vec(data):
 
 def transform_labels(labels):
     label_encoder = LabelEncoder()
-    return label_encoder.fit_transform(labels)
+    encoded_labels = label_encoder.fit_transform(labels) 
+    return encoded_labels, label_encoder
 
 def feature_post_processing(features):
     features.fillna(0, axis=1, inplace=True)
@@ -38,7 +39,7 @@ def generate_clf(csv):
     df = pd.read_csv(csv)
     features = do_word2vec(df["comments"])
     features = feature_post_processing(features)
-    labels = transform_labels(df["labels"])
+    labels, encoder = transform_labels(df["labels"])
     clf = SVC(class_weight="balanced",
         tol=1e-5,
         gamma="scale",
@@ -47,6 +48,7 @@ def generate_clf(csv):
         C=0.8)
     clf.fit(features, labels)
     joblib.dump(clf, 'clf.joblib')
+    joblib.dump(encoder, 'label_encoder.joblib')
 
 if __name__ == '__main__':
     generate_clf("labeled_data.csv")
