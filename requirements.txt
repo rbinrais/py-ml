@@ -6,3 +6,8 @@ sklearn
 sseclient
 azure-storage
 python-dotenv
+gensim
+keras
+#tensorflow !!ISSUE: tensorflow does not work with python version >3.6
+nltk
+joblib
