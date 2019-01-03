@@ -7,10 +7,10 @@ from sklearn import linear_model
 import pandas as pd
 import code
 from glob import glob
+import azure_helper
 
-def _get_data():
-    csv = "wikipedia/comments.csv"
-    return pd.read_csv(csv)
+def _get_data(file_name):
+    return pd.read_csv(file_name)
 
 def _clean_data(df):
     return df[pd.notnull(df["comments"])]
@@ -50,20 +50,21 @@ def _get_new_labels(labels, df):
     df["labels"] = new_labels
     return df
 
-def propagate_labels():
-    df = _get_data()
+def propagate_labels(file_name):
+    df = _get_data(file_name)
     df = _clean_data(df)
     labels = _label_propagation(df)
     return _get_new_labels(labels, df)
 
-def _save_data(df, path):
-    if os.path.exists(path):
-        tmp = pd.read_csv(path)
+def _save_data(df, file_name):
+    if os.path.exists(file_name):
+        tmp = pd.read_csv(file_name)
         df = df.append(tmp)
-    df.to_csv(path, index=False)
+    df.to_csv(file_name, index=False)
+    azure_helper.upload_to_blob(file_name,file_name)
 
 if __name__ == '__main__':
-    df = propagate_labels()
+    df = propagate_labels("wikipedia/comments_with_labels.csv")
     _save_data(df, "labeled_data.csv")
 
 # How to do this in general:
