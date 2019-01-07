@@ -1,0 +1,8 @@
+FROM python:3
+
+WORKDIR /usr/src/app
+COPY requirements.manually_label.txt ./
+COPY azure_helper.py ./
+COPY manually_label.py ./
+RUN pip install --no-cache-dir -r requirements.manually_label.txt
+CMD [ "python", "./manually_label.py" ]

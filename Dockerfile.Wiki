@@ -1,8 +1,8 @@
 FROM python:3
 
 WORKDIR /usr/src/app
-COPY requirements.txt ./
+COPY requirements.wikipedia.txt ./
 COPY wikipedia_events_listener.py ./
 COPY azure_helper.py ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.wikipedia.txt
 CMD [ "python", "./wikipedia_events_listener.py" ]

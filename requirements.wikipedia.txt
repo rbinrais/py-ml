@@ -1,0 +1,4 @@
+sseclient
+pandas
+azure-storage
+python-dotenv

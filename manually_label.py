@@ -1,4 +1,5 @@
 import pandas as pd
+import azure_helper
 
 def get_csv(folder, filename):
     path = folder+"/"+filename
@@ -42,6 +43,7 @@ def ask_for_labels(folder, filename):
     name += "_with_labels"
     filename = name + "." +ext
     write_csv(df, folder, filename)
+    azure_helper.upload_to_blob(filename,folder+"/"+filename)
 
 if __name__ == '__main__':
     ask_for_labels("wikipedia", "comments.csv")
