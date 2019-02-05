@@ -126,6 +126,9 @@ Prediction is done by reading the model `clf.joblib` created in the previous ste
 
  The `pedicted_labels.csv` file is generated as an output and uploaded to the Azure blob storage. This file contains all the comments along with the predicted labels _syntax_ or _semantics_.
 
+# ML Pipeline Using Azure Logic Apps
 
+![Pipeline](https://github.com/rbinrais/py-ml/blob/master/images/pipeline-1.png "")
+![Pipeline](https://github.com/rbinrais/py-ml/blob/master/images/pipeline-2.png "")
  
  
